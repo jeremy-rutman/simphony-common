@@ -14,7 +14,7 @@ class TestCudsFile(unittest.TestCase):
         # create some particles
         self.particles = []
         for i in xrange(10):
-            self.particles.append(Particle((1.1*i, 2.2*i, 3.3*i), id=i))
+            self.particles.append(Particle((1.1*i, 2.2*i, 3.3*i), uuid=i))
 
         self.file_a = CudsFile.open('test_A.cuds')
         self.file_b = CudsFile.open('test_B.cuds')

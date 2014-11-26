@@ -93,7 +93,7 @@ class FileParticleContainer(ABCParticleContainer):
         for row in self._group.particles.where(
                 'id == value', condvars={'value': id}):
             return Particle(
-                id=id, coordinates=tuple(row['coordinates']))
+                uuid=id, coordinates=tuple(row['coordinates']))
         else:
             raise ValueError(
                 'Particle (id={id}) does not exist'.format(id=id))
@@ -121,7 +121,7 @@ class FileParticleContainer(ABCParticleContainer):
         if ids is None:
             for row in self._group.particles:
                 yield Particle(
-                    id=row['id'], coordinates=tuple(row['coordinates']))
+                    uuid=row['id'], coordinates=tuple(row['coordinates']))
         else:
             # FIXME: we might want to use an indexed query for these cases.
             for particle_id in ids:
@@ -180,7 +180,7 @@ class FileParticleContainer(ABCParticleContainer):
                 'id == value', condvars={'value': id}):
             particles = row['particle_ids'][:row['n_particle_ids']]
             # FIXME: do we have to convert to a tuple, why not a list?
-            return Bond(id=row['id'], particles=tuple(particles))
+            return Bond(uuid=row['id'], particles=tuple(particles))
         else:
             raise ValueError('Bond (id={id}) does not exist'.format(id=id))
 
@@ -208,7 +208,7 @@ class FileParticleContainer(ABCParticleContainer):
             for row in self._group.bonds:
                 n = row['n_particle_ids']
                 particles = row['particle_ids'][:n]
-                yield Bond(id=row['id'], particles=tuple(particles))
+                yield Bond(uuid=row['id'], particles=tuple(particles))
         else:
             for id in ids:
                 yield self.get_bond(id)

@@ -34,12 +34,12 @@ class TestFileParticleContainer(unittest.TestCase):
         self.pc = self.file.add_particle_container("test")
 
         # create two particles (with unique ids)
-        self.particle_1 = Particle((0.1, 0.4, 5.0), id=0)
-        self.particle_2 = Particle((0.2, 0.45, 50.0), id=1)
+        self.particle_1 = Particle((0.1, 0.4, 5.0), uuid=0)
+        self.particle_2 = Particle((0.2, 0.45, 50.0), uuid=1)
 
         # create two bonds (with unique ids)
-        self.bond_1 = Bond((1, 0), id=0)
-        self.bond_2 = Bond((0, 1), id=1)
+        self.bond_1 = Bond((1, 0), uuid=0)
+        self.bond_2 = Bond((0, 1), uuid=1)
 
     def tearDown(self):
         if os.path.exists(self.filename):
@@ -111,7 +111,7 @@ class TestFileParticleContainer(unittest.TestCase):
         particles = []
         for i in xrange(10):
             particles.append(Particle(
-                id=i, coordinates=(0.0, 0.0, 0.0)))
+                uuid=i, coordinates=(0.0, 0.0, 0.0)))
 
         for p in particles:
             self.pc.add_particle(p)
@@ -197,7 +197,7 @@ class TestFileParticleContainer(unittest.TestCase):
 
         bonds = []
         for i in xrange(10):
-            bonds.append(Bond(id=i, particles=(0, 0)))
+            bonds.append(Bond(uuid=i, particles=(0, 0)))
 
         for bond in bonds:
             self.pc.add_bond(bond)
