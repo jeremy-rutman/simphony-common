@@ -14,8 +14,7 @@
 
 from __future__ import print_function
 import copy
-import random
-import numpy as np
+import uuid
 # custom imports:
 from simphony.cuds.abstractparticles import ABCParticleContainer
 import simphony.cuds.pcexceptions as pce
@@ -212,7 +211,7 @@ class ParticleContainer(ABCParticleContainer):
         Parameters
         ----------
 
-        particle_id : uint32
+        particle_id : int
             the id of the particle
 
         Raises
@@ -237,7 +236,7 @@ class ParticleContainer(ABCParticleContainer):
         Parameters
         ----------
 
-        bond_id : uint32
+        bond_id : int
             the id of the bond
 
         Raises
@@ -265,7 +264,7 @@ class ParticleContainer(ABCParticleContainer):
         Parameters
         ----------
 
-        particle_id : Particle
+        particle_id : int
             the id of the particle to be removed.
 
         Raises
@@ -304,7 +303,7 @@ class ParticleContainer(ABCParticleContainer):
         Parameters
         ----------
 
-        bond_id : Bond
+        bond_id : int
             the id of the bond to be removed.
 
         See Also
@@ -468,7 +467,7 @@ class ParticleContainer(ABCParticleContainer):
         # We check if the current dictionary has the element
         cur_id = element.id
         if cur_id is None:
-            cur_id = self._generate_unique_id(cur_dict)
+            cur_id = uuid.uuid4()
             element.id = cur_id
             cur_dict[cur_id] = copy.deepcopy(element)
         else:
@@ -498,21 +497,13 @@ class ParticleContainer(ABCParticleContainer):
             raise KeyError(pce._PC_errors['ParticleContainer_UnknownValue']
                            + " id: " + str(cur_id))
 
-    def _generate_unique_id(self, cur_dict, number_tries=1000):
-        max_int = np.iinfo(np.uint32).max
-        for n in xrange(number_tries):
-            cur_id = random.randint(0, max_int)
-            if cur_id not in cur_dict:
-                return cur_id
-        raise Exception(pce._PC_errors['ParticleContainer_IdNotGenerated'])
-
 
 class Particle(object):
     """Class representing a particle.
 
     Attributes
     ----------
-        id : uint32
+        id : int
             the unique id of the particle
         coordinates : list / tuple
             x,y,z coordinates of the particle
@@ -523,14 +514,14 @@ class Particle(object):
     ----------
         coordinates : list / tuple
             x,y,z coordinates of the particle (Default: [0, 0, 0])
-        id : uint32
+        uuid : int
             the id, None as default (the particle container will generate it)
         data : DataContainer
             the data, the particle will have a copy of this
     """
 
-    def __init__(self, coordinates=None, id=None, data=None):
-        self.id = id
+    def __init__(self, coordinates=None, uuid=None, data=None):
+        self.id = uuid
         if coordinates:
             self.coordinates = coordinates
         else:
@@ -550,7 +541,7 @@ class Bond(object):
 
     Attributes
     ----------
-        id : uint32
+        id : int
             the unique id of the bond
         particles : list
             list of particles / elements of the bond
@@ -561,14 +552,14 @@ class Bond(object):
     ----------
         particles : sequence
             list of particles of the bond. It can not be empty.
-        id : uint32
+        uuid : int
             the id, None as default (the particle container will generate it)
         data : DataContainer
             DataContainer to store the attributes of the bond
     """
 
-    def __init__(self, particles, id=None, data=None):
-        self.id = id
+    def __init__(self, particles, uuid=None, data=None):
+        self.id = uuid
         if particles is not None and len(particles) > 0:
             self.particles = particles
         else:
