@@ -9,6 +9,7 @@ import copy
 import tables
 
 from simphony.io.file_particle_container import FileParticleContainer
+from file_lattice import FileLattice
 
 
 class CudsFile(object):
@@ -35,6 +36,7 @@ class CudsFile(object):
 
         self._file = file
         self._particle_containers = {}
+        self._lattices = {}
 
     def valid(self):
         """Checks if file is valid (i.e. open)
@@ -85,6 +87,59 @@ class CudsFile(object):
         """
         self._file.close()
 
+    def add_lattice(self, name, lattice=None, keywords=[]):
+        """Add lattice to the file.
+
+        Parameters
+        ----------
+        name : str
+            name of lattice
+        lattice : Lattice, optional
+            lattice to be added. If none is given,
+            then an empty lattice is added.
+        keywords : list of str, optional
+            keywords to be copied from lattice to FileLattice.
+            If 'none' then copy everything.
+
+
+        Returns
+        ----------
+        FileLattice
+            The lattice newly added to the file.  See
+            get_lattice for more information.
+
+        """
+        if name in self._file.root.lattice:
+            raise ValueError(
+                'Lattice \'{n}\` already exists'.format(n=name))
+
+        lat = FileLattice(self._file, name, lattice)
+        self._lattices[name] = (lat, self._file.root.lattice)
+
+        if lattice:
+            # copy the contents of the lattice to the file
+            for lattice_node in lattice.iter_nodes():
+                # lat.add_node(lattice_node,keywords)
+                lat.add_node(lattice_node, lattice_node.data.keys())
+
+        self._file.flush()
+        return lat
+
+    def delete_lattice(self, name):
+        """Delete lattice from file.
+
+        Parameters
+        ----------
+        name : str
+            name of lattice to delete
+        """
+        if name in self._lattices:
+            self._file.getNode(self._lattices[name][1], name)._f_remove()
+            del self._lattices[name]
+        else:
+            raise ValueError(
+                'Lattice \'{n}\` does not exist'.format(n=name))
+
     def add_particle_container(self, name, particle_container=None):
         """Add particle container to the file.
 
@@ -120,6 +175,29 @@ class CudsFile(object):
 
         self._file.flush()
         return pc
+
+    def get_lattice(self, name):
+        """Get lattice from file.
+
+        The returned lattice can be used to query
+        and change the related data stored in the file. If the
+        file has been closed then the lattice should
+        no longer be used.
+
+        Parameters
+        ----------
+        name : str
+            name of lattice to return
+        """
+        if name in self._lattices:
+            return self._lattices[name][0]
+        elif name in self._file.root.lattice:
+            lat = FileLattice(self._file, name)
+            self._lattices[name] = lat
+            return lat
+        else:
+            raise ValueError(
+                'Lattice \'{n}\` does not exist'.format(n=name))
 
     def get_particle_container(self, name):
         """Get particle container from file.
