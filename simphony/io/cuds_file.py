@@ -87,16 +87,15 @@ class CudsFile(object):
         """
         self._file.close()
 
-    def add_lattice(self, name, lattice=None, keywords=[]):
+    def add_lattice(self, name, lattice, keywords=[]):
         """Add lattice to the file.
 
         Parameters
         ----------
         name : str
             name of lattice
-        lattice : Lattice, optional
-            lattice to be added. If none is given,
-            then an empty lattice is added.
+        lattice : Lattice
+            lattice to be added.
         keywords : list of str, optional
             keywords to be copied from lattice to FileLattice.
             If 'none' then copy everything.
@@ -113,14 +112,14 @@ class CudsFile(object):
             raise ValueError(
                 'Lattice \'{n}\` already exists'.format(n=name))
 
-        lat = FileLattice(self._file, name, lattice)
+        lat = FileLattice(self, name, lattice._type, lattice._base_vect,
+                            lattice._size, lattice._origin)
         self._lattices[name] = (lat, self._file.root.lattice)
 
-        if lattice:
-            # copy the contents of the lattice to the file
-            for lattice_node in lattice.iter_nodes():
-                # lat.add_node(lattice_node,keywords)
-                lat.add_node(lattice_node, lattice_node.data.keys())
+
+        # copy the contents of the lattice to the file
+        for node in lattice.iter_nodes():
+            lat.update_node(node, node.data.keys())
 
         self._file.flush()
         return lat
@@ -192,7 +191,9 @@ class CudsFile(object):
         if name in self._lattices:
             return self._lattices[name][0]
         elif name in self._file.root.lattice:
-            lat = FileLattice(self._file, name)
+            F = self._file.root.lattice._v_leaves[name].attrs
+            lat = FileLattice(self._file, name, F.type, F.base_vect,
+                              F.size, F.origin)
             self._lattices[name] = lat
             return lat
         else:
