@@ -95,51 +95,70 @@ class FileLattice:
         # after CUBA keywords where prefix 'CUBA.' is removed from the name.
         # TODO: Could use one predefined dictionary instead of the following
         # data type comparison
-        C = self._ColDescr
+        # CD = self._ColDescr
         for key in keywords:
             # ND data has a different type than 1D
             if any([type(data[key]) == list,
                     type(data[key]) == numpy.ndarray]):
                 if type(data[key][0]) == str:
-                    C = type("_ColDescr", (C,),
+                    self._ColDescr = type("_ColDescr", (self._ColDescr,),
                              {str(key)[5:]: StringCol(16, dflt="",
-                              pos=len(C.columns), shape=len(data[key]))})
-                elif type(data[key][0]) == long:
-                    C = type("_ColDescr", (C,),
-                             {str(key)[5:]: Int64Col(
-                              pos=len(C.columns), shape=len(data[key]))})
-                elif type(data[key][0]) == int or numpy.int32:
-                    C = type("_ColDescr", (C,),
-                             {str(key)[5:]: Int32Col(
-                              pos=len(C.columns), shape=len(data[key]))})
-                elif type(data[key][0]) == float or numpy.float64:
-                    C = type("_ColDescr", (C,),
-                             {str(key)[5:]: Float64Col(pos=len(C.columns),
+                              pos=len(self._ColDescr.columns),
                               shape=len(data[key]))})
+                elif type(data[key][0]) == long:
+                    self._ColDescr = type("_ColDescr", (self._ColDescr,),
+                             {str(key)[5:]: Int64Col(
+                              pos=len(self._ColDescr.columns),
+                              shape=len(data[key]))})
+                elif type(data[key][0]) == float or numpy.float64:
+                    self._ColDescr = type("_ColDescr", (self._ColDescr,),
+                             {str(key)[5:]: Float64Col(pos=len(
+                              self._ColDescr.columns),
+                              shape=len(data[key]))})
+                elif type(data[key][0]) == int or numpy.int32:
+                    self._ColDescr = type("_ColDescr", (self._ColDescr,),
+                             {str(key)[5:]: Int32Col(
+                              pos=len(self._ColDescr.columns), shape=len(
+                              data[key]))})
             else:
                 if type(data[key]) == str:
-                    C = type("_ColDescr", (C,),
+                    self._ColDescr = type("_ColDescr", (self._ColDescr,),
                              {str(key)[5:]: StringCol(16, dflt="",
-                              pos=len(C.columns))})
+                              pos=len(self._ColDescr.columns))})
                 elif type(data[key]) == long:
-                    C = type("_ColDescr", (C,),
-                             {str(key)[5:]: Int64Col(pos=len(C.columns))})
+                    self._ColDescr = type("_ColDescr", (self._ColDescr,),
+                             {str(key)[5:]: Int64Col(pos=len(
+                             self._ColDescr.columns))})
                 elif type(data[key]) == int or numpy.int32:
-                    C = type("_ColDescr", (C,),
-                             {str(key)[5:]: Int32Col(pos=len(C.columns))})
+                    self._ColDescr = type("_ColDescr", (self._ColDescr,),
+                             {str(key)[5:]: Int32Col(pos=len(
+                              self._ColDescr.columns))})
                 elif type(data[key]) == float or numpy.float64:
-                    C = type("_ColDescr", (C,),
-                             {str(key)[5:]: Float64Col(pos=len(C.columns))})
+                    self._ColDescr = type("_ColDescr", (self._ColDescr,),
+                             {str(key)[5:]: Float64Col(pos=len(
+                              self._ColDescr.columns))})
 
     def _index(self, n):
-        """ Return 3D index of row n
-        TODO: Write support for ND indexing
+        """ Return ND index of row n, where N is the dimension of the lattice
+        Parameters:
+            n : int
+                Row number
+        Returns:
+            I : tuple of int16
+                ND tuple of lattice indices corresponding to row n
         """
         S = self._size
-        i = int(n/(S[1]*S[2]))
-        j = int((n-i*S[1]*S[2])/S[2])
-        k = n-i*S[1]*S[2]-j*S[2]
-        return (i, j, k)
+        Q = numpy.zeros(len(S),numpy.int64)
+        I = numpy.zeros(len(S),numpy.int16)
+
+        Q[len(S)-1] = 1
+        for i in range(-len(S)+2,1):
+            Q[-i] = Q[-i+1]*S[-i+1]
+
+        I[0] = int(n/Q[0])
+        for i in range(1,len(S)):
+            I[i] = int((n-numpy.dot(I,Q))/Q[i])
+        return tuple(I)
 
     def _get_row_index(self, id):
         """ Get row number from table for node with indices 'id'
@@ -237,11 +256,14 @@ class FileLattice:
                     self._file.create_carray(self._group,
                                              self._maskname+'_new', atom,
                                              self._size, filters=filters)
-                self._newbitmask = \
+                self._newbitmask[:] = \
                     numpy.array(self._bitmask, dtype='uint'+str(
                                 self._mask_size))
+
                 self._bitmask._f_remove()
                 self._bitmask = self._newbitmask
+                self._file.root.lattice._v_leaves[
+                    self._maskname+'_new'].rename(self._maskname)
 
     def _update_bitmask(self, id, name):
         """ Writes a bit 1 to bitmask to flag a defined DataContainer for
