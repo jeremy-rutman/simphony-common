@@ -102,41 +102,44 @@ class FileLattice:
                     type(data[key]) == numpy.ndarray]):
                 if type(data[key][0]) == str:
                     self._ColDescr = type("_ColDescr", (self._ColDescr,),
-                             {str(key)[5:]: StringCol(16, dflt="",
-                              pos=len(self._ColDescr.columns),
-                              shape=len(data[key]))})
+                                          {str(key)[5:]: StringCol(16,
+                                           dflt="",
+                                           pos=len(self._ColDescr.columns),
+                                           shape=len(data[key]))})
                 elif type(data[key][0]) == long:
                     self._ColDescr = type("_ColDescr", (self._ColDescr,),
-                             {str(key)[5:]: Int64Col(
-                              pos=len(self._ColDescr.columns),
-                              shape=len(data[key]))})
+                                          {str(key)[5:]: Int64Col(
+                                           pos=len(self._ColDescr.columns),
+                                           shape=len(data[key]))})
                 elif type(data[key][0]) == float or numpy.float64:
                     self._ColDescr = type("_ColDescr", (self._ColDescr,),
-                             {str(key)[5:]: Float64Col(pos=len(
-                              self._ColDescr.columns),
-                              shape=len(data[key]))})
+                                          {str(key)[5:]:
+                                           Float64Col(pos=len(
+                                               self._ColDescr.columns),
+                                              shape=len(data[key]))})
                 elif type(data[key][0]) == int or numpy.int32:
                     self._ColDescr = type("_ColDescr", (self._ColDescr,),
-                             {str(key)[5:]: Int32Col(
-                              pos=len(self._ColDescr.columns), shape=len(
-                              data[key]))})
+                                          {str(key)[5:]: Int32Col(
+                                           pos=len(self._ColDescr.columns),
+                                           shape=len(data[key]))})
             else:
                 if type(data[key]) == str:
                     self._ColDescr = type("_ColDescr", (self._ColDescr,),
-                             {str(key)[5:]: StringCol(16, dflt="",
-                              pos=len(self._ColDescr.columns))})
+                                          {str(key)[5:]: StringCol(16,
+                                           dflt="",
+                                           pos=len(self._ColDescr.columns))})
                 elif type(data[key]) == long:
                     self._ColDescr = type("_ColDescr", (self._ColDescr,),
-                             {str(key)[5:]: Int64Col(pos=len(
-                             self._ColDescr.columns))})
+                                          {str(key)[5:]: Int64Col(pos=len(
+                                           self._ColDescr.columns))})
                 elif type(data[key]) == int or numpy.int32:
                     self._ColDescr = type("_ColDescr", (self._ColDescr,),
-                             {str(key)[5:]: Int32Col(pos=len(
-                              self._ColDescr.columns))})
+                                          {str(key)[5:]: Int32Col(pos=len(
+                                           self._ColDescr.columns))})
                 elif type(data[key]) == float or numpy.float64:
                     self._ColDescr = type("_ColDescr", (self._ColDescr,),
-                             {str(key)[5:]: Float64Col(pos=len(
-                              self._ColDescr.columns))})
+                                          {str(key)[5:]: Float64Col(pos=len(
+                                           self._ColDescr.columns))})
 
     def _index(self, n):
         """ Return ND index of row n, where N is the dimension of the lattice
@@ -148,16 +151,16 @@ class FileLattice:
                 ND tuple of lattice indices corresponding to row n
         """
         S = self._size
-        Q = numpy.zeros(len(S),numpy.int64)
-        I = numpy.zeros(len(S),numpy.int16)
+        Q = numpy.zeros(len(S), numpy.int64)
+        I = numpy.zeros(len(S), numpy.int16)
 
-        Q[len(S)-1] = 1
-        for i in range(-len(S)+2,1):
-            Q[-i] = Q[-i+1]*S[-i+1]
+        Q[len(S) - 1] = 1
+        for i in range(-len(S) + 2, 1):
+            Q[-i] = Q[-i + 1] * S[-i + 1]
 
-        I[0] = int(n/Q[0])
-        for i in range(1,len(S)):
-            I[i] = int((n-numpy.dot(I,Q))/Q[i])
+        I[0] = int(n / Q[0])
+        for i in range(1, len(S)):
+            I[i] = int((n - numpy.dot(I, Q)) / Q[i])
         return tuple(I)
 
     def _get_row_index(self, id):
