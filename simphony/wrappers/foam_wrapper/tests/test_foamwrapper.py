@@ -6,10 +6,8 @@ mesh module functionalities
 """
 
 import unittest
-from Foam import ref,man
 from simphony.wrappers.foam_wrapper.model import Model
 from simphony.wrappers.foam_wrapper.foam_wrapper import Foam_wrapper
-
 
 class FoamWrapperTestCase(unittest.TestCase):
     """Test case for Foam_wrapper class"""
@@ -17,7 +15,7 @@ class FoamWrapperTestCase(unittest.TestCase):
         """Creates dummy model to perform tests"""
         self.model = Model(1)
 
-        
+
     def test_meshRead(self):
         """Test mesh read from OpenFoam to Simphony"""
         foam_wrapper = Foam_wrapper(self.model)
@@ -28,4 +26,3 @@ class FoamWrapperTestCase(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

@@ -2,30 +2,27 @@
 
 Wrapper module for OpenFOAM using pythonFlu -python interface
 NOTE: at a moment pythonFlu supports only up to 2.0.1 -version of OpenFOAM
-  
+
 """
-import copy
-from Foam import ref,man
-from simphony.cuds.mesh import Mesh,Point,Face,Edge,Cell
+#import copy
+from Foam import ref, man
+from simphony.cuds.mesh import Mesh, Point, Face, Edge, Cell
 import inspect
-from Foam.OpenFOAM import IOobject,fileName,word
-from collections import defaultdict
-from Foam.finiteVolume import volScalarField
+from Foam.OpenFOAM import fileName, word
+#from collections import defaultdict
+#from Foam.finiteVolume import volScalarField
 
 
 class Foam_wrapper(object):
-    
-    def __init__(self,model):
+
+    def __init__(self, model):
         self.model = model
 
-    
-
-    def has_common_vertex(self,facePoints0,facePoints1):
+    def has_common_vertex(self, facePoints0, facePoints1):
         for point in facePoints0:
-                if point in facePoints1 :
+                if point in facePoints1:
                     return True
         return False
-    
 
     def get_mesh(self, foamCaseName):
         """ Reads given OpenFoam -mesh from "foamCaseName" -directory and returns SimPhony mesh
@@ -178,7 +175,7 @@ class Foam_wrapper(object):
 # to get this work pythonFlu must be extended
 
 
-    def to_foam_mesh(self,simphonyMesh):
+    def to_foam_mesh(self, simphonyMesh):
 
         foamPoints = []
         for point in simphonyMesh.iter_points():

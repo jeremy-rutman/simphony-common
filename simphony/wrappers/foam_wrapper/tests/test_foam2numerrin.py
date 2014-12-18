@@ -6,7 +6,6 @@ mesh module functionalities
 """
 
 import unittest
-from Foam import ref,man
 from simphony.wrappers.foam_wrapper.model import Model
 from simphony.wrappers.foam_wrapper.foam_wrapper import Foam_wrapper
 from simphony.wrappers.numerrin_wrapper.numerrin_wrapper import NumerrinWrapper
@@ -42,4 +41,3 @@ class FoamNumerrinWrapperTestCase(unittest.TestCase):
         
 if __name__ == '__main__':
     unittest.main()
-
