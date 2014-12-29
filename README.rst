@@ -24,6 +24,20 @@ or::
     # build for in-place development
     python setup.py develop
 
+If your system has multiple python versions installed, you may need to call python2.7
+explicitly, for instance
+
+   python2.7 setup.py install
+
+If you do not have write permission outside your home directory you may want to install 
+to a particular directory using
+
+   python setup.py develop --install-dir mydirectory
+
+where mydirectory is a directory in which you have write permission.
+Doing this will in turn require setting the PYTHONPATH environment variable to
+include mydirectory.
+
 Testing
 -------
 
