@@ -24,8 +24,8 @@ or::
     # build for in-place development
     python setup.py develop
 
-If your system has multiple python versions installed, you may need to call python2.7
-explicitly, for instance
+If your system has multiple python versions installed, you may need to call the desired
+version explicitly, for instance
 
    python2.7 setup.py install
 
